@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>Number guessing game</title>
+
+    <style>
+      html {
+        font-family: sans-serif;
+      }
+      body {
+        width: 50%;
+        max-width: 800px;
+        min-width: 480px;
+        margin: 0 auto;
+      }
+      /* .lastResult {
+        color: white;
+        padding: 3px;
+      } */
+      /* WHAT DID THIS DO? */
+      .lowOrHi {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Number guessing game</h1>
+
+    <p>
+      We have selected a random number between 1 and 100. See if you can guess it in 10 turns or fewer.
+      We'll tell you if your guess was too high or too low.
+    </p>
+<!-- CHANGED DIV CLASS FORM INTO FORM CLASS FORM TO MAKE ENTER HIT THE SUBMIT -->
+    <form class="form" name="guessForm">
+      <label for="guessField">Enter a guess: </label><input type="text" id="guessField" class="guessField">
+      <input type="submit" value="Guess" class="guessSubmit" id="submit">
+    </form>
+
+    <div class="resultParams">
+      <p class="guesses"></p>
+      <p class="lastResult"></p>
+      <p class="lowOrHi"></p>
+    </div>
+
+    <script>
+      'use strict';
+        
+        let randomNumber = Math.floor(Math.random()* 100) + 1;
+
+        // TODO: change selectors to use IDs
+
+        const guesses = document.querySelector('.guesses');
+        const lastResult = document.querySelector('.lastResult');
+        const lowOrHi = document.querySelector('.lowOrHi');
+
+        const guessSubmit = document.querySelector('#submit');
+        const guessField = document.querySelector('.guessField');
+
+        // Get form by name
+        const guessForm = document['guessForm'];
+
+        let guessCount = 1;
+
+        guessField.focus();
+
+        function checkGuess() {
+          console.log('checkGuess');
+
+          const userGuess = Number(guessField.value);
+          if (Number.isNaN(userGuess)) {
+            lastResult.textContent = 'The guess was not a number';
+            lowOrHi.style.display = 'none';
+            // Prevent form from submitting
+            // Since this is not a number, return
+            return false;
+          }
+
+          if (guessCount === 1) {
+            guesses.textContent = 'Previous guesses: ';
+          }
+          guesses.textContent += userGuess + ' ';
+
+          if (userGuess === randomNumber) {
+            lastResult.textContent = 'Congratulations! You got it right!';
+            lastResult.style.backgroundColor = 'green';
+            lowOrHi.style.display = 'none';
+            setGameOver();
+          } else if (guessCount === 10) {
+            lastResult.textContent = '!!!GAME OVER!!!';
+            setGameOver();
+          } else {
+            lastResult.textContent = 'Wrong!';
+            lastResult.style.backgroundColor = 'red';
+            lowOrHi.style.display = 'block';
+            if (userGuess < randomNumber) {
+              lowOrHi.textContent = 'Last guess was too low!';
+            } else if (userGuess > randomNumber) {
+              lowOrHi.textContent = 'Last guess was too high!';
+            }
+          }
+
+          guessCount++;
+          guessField.value = '';
+          guessField.focus();
+
+          // Prevent form from submitting
+          return false;
+        }
+
+        // THIS CHANGED FROM ON CLICK
+        guessForm.onsubmit = checkGuess;
+
+        function setGameOver() {
+          guessField.disabled = true;
+          guessSubmit.disabled = true;
+
+          // Create new reset button
+          const resetButton = document.createElement('button');
+          resetButton.textContent = 'Start new game';
+          resetButton.id = 'resetButton';
+          document.body.appendChild(resetButton);
+          resetButton.addEventListener('click', resetGame);
+        }
+
+        function resetGame() {
+          guessCount = 1;
+
+          const resultParams = document.querySelectorAll('.resultParams p');
+          for (let i = 0; i < resultParams.length; i++) {
+            resultParams[i].textContent = '';
+          }
+
+          // Get the existing reset button
+          const resetButton = document.querySelector('#resetButton');
+          resetButton.parentNode.removeChild(resetButton);
+
+          guessField.disabled = false;
+          guessSubmit.disabled = false;
+          guessField.value = '';
+          guessField.focus(); 
+
+          lastResult.style.backgroundColor = 'white';
+
+          randomNumber = Math.floor(Math.random() * 100) + 1;
+        }
+
+    </script>
+  </body>
+</html>
